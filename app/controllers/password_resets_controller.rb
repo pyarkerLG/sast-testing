@@ -3,7 +3,18 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authenticated
 
   def reset_password
-    user = Marshal.load(Base64.decode64(params[:user])) unless params[:user].nil?
+    user = nil
+    
+    # Safely verify and extract user ID from signed token
+    if params[:user_token].present?
+      begin
+        user_data = verifier.verify(params[:user_token])
+        user = User.find_by(id: user_data[:user_id]) if user_data[:user_id]
+      rescue ActiveSupport::MessageVerifier::InvalidSignature
+        # Token is invalid or tampered with
+        user = nil
+      end
+    end
 
     if user && params[:password] && params[:confirm_password] && params[:password] == params[:confirm_password]
       user.password = params[:password]
@@ -18,6 +29,8 @@ class PasswordResetsController < ApplicationController
 
   def confirm_token
     if !params[:token].nil? && is_valid?(params[:token])
+      # Generate a signed token containing only the user ID for the password reset form
+      @user_token = verifier.generate({user_id: @user.id, expires_at: 1.hour.from_now})
       flash[:success] = "Password reset token confirmed! Please create a new password."
       render "password_resets/reset_password"
     else
@@ -38,6 +51,10 @@ class PasswordResetsController < ApplicationController
   end
 
   private
+
+  def verifier
+    @verifier ||= ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
+  end
 
   def password_reset_mailer(user)
     token = generate_token(user.id, user.email)
