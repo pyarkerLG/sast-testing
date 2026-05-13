@@ -65,6 +65,9 @@ $('#submit_button').click(function() {
       url: "/admin/" +  <%= @user.id %> + "/update_user.json",
     data: valuesToSubmit,
     type: "POST",
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+    },
     success: function(response) {
       $('#success').show(500).delay(1500).fadeOut();
     loadTable();
@@ -82,6 +85,9 @@ $('#delete_button').click(function() {
   $.ajax({
       url: "/admin/" +  <%= params[:admin_id] %> + "/delete_user.json",
     type: "POST",
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+    },
     success: function(response) {
       $('#success').show(500).delay(1500).fadeOut();
     loadTable();
