@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class AdminController < ApplicationController
-  before_action :administrative, if: :admin_param, except: [:get_user]
+  before_action :administrative
   skip_before_action :has_info
   layout false, only: [:get_all_users, :get_user]
 
@@ -27,6 +27,7 @@ class AdminController < ApplicationController
 
   def get_user
     @user = User.find_by_id(params[:admin_id].to_s)
+    return render json: { error: "User not found" }, status: :not_found unless @user
     arr = ["true", "false"]
     @admin_select = @user.admin ? arr : arr.reverse
   end
@@ -64,8 +65,4 @@ class AdminController < ApplicationController
     params.require(:field).keys
   end
   helper_method :custom_fields
-
-  def admin_param
-    params[:admin_id] != "1"
-  end
 end
