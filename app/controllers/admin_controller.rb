@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class AdminController < ApplicationController
-  before_action :administrative, if: :admin_param, except: [:get_user]
+  before_action :administrative, except: [:get_user]
   skip_before_action :has_info
   layout false, only: [:get_all_users, :get_user]
 
@@ -26,13 +26,13 @@ class AdminController < ApplicationController
   end
 
   def get_user
-    @user = User.find_by_id(params[:admin_id].to_s)
+    @user = User.find_by_id(params[:id].to_s)
     arr = ["true", "false"]
     @admin_select = @user.admin ? arr : arr.reverse
   end
 
   def update_user
-    user = User.find_by_id(params[:admin_id])
+    user = User.find_by_id(params[:id])
     if user
       user.update(params[:user].reject { |k| k == ("password" || "password_confirmation") })
       pass = params[:user][:password]
@@ -46,7 +46,7 @@ class AdminController < ApplicationController
   end
 
   def delete_user
-    user = User.find_by(id: params[:admin_id])
+    user = User.find_by(id: params[:id])
     if user && !(current_user.id == user.id)
       # Call destroy here so that all association records w/ id are destroyed as well
       # Example user.retirement records would be destroyed
@@ -65,7 +65,5 @@ class AdminController < ApplicationController
   end
   helper_method :custom_fields
 
-  def admin_param
-    params[:admin_id] != "1"
-  end
+
 end
