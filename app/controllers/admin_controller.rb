@@ -32,9 +32,20 @@ class AdminController < ApplicationController
   end
 
   def update_user
+    # Ensure only admin users can update other users
+    unless is_admin?
+      respond_to do |format|
+        format.json { render json: { msg: "unauthorized" }, status: :unauthorized }
+      end
+      return
+    end
+    
     user = User.find_by_id(params[:admin_id])
     if user
-      user.update(params[:user].reject { |k| k == ("password" || "password_confirmation") })
+      # Only allow admin users to update admin status
+      permitted_params = params[:user].reject { |k| k == "password" || k == "password_confirmation" }
+      
+      user.update(permitted_params)
       pass = params[:user][:password]
       user.password = pass if !(pass.blank?)
       user.save!
