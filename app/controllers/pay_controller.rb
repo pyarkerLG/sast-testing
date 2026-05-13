@@ -26,11 +26,15 @@ class PayController < ApplicationController
   end
 
   def destroy
-    pay = Pay.find_by_id(params[:id])
-    if pay.present? and pay.destroy
-      flash[:success] = "Successfully Deleted Entry"
-    else
-      flash[:error] = "Unable to process that request at this time"
+    begin
+      pay = current_user.pay.find(params[:id])
+      if pay.destroy
+        flash[:success] = "Successfully Deleted Entry"
+      else
+        flash[:error] = "Unable to process that request at this time"
+      end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Record not found"
     end
     redirect_to user_pay_index_path
   end
