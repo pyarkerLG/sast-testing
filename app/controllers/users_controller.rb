@@ -30,9 +30,7 @@ class UsersController < ApplicationController
 
     if user
       user.update(user_params_without_password)
-      if params[:user][:password].present? && (params[:user][:password] == params[:user][:password_confirmation])
-        user.password = params[:user][:password]
-      end
+      update_user_password(user) if password_update_requested?
       message = true if user.save!
       respond_to do |format|
         format.html { redirect_to user_account_settings_path(user_id: current_user.id) }
@@ -53,5 +51,16 @@ class UsersController < ApplicationController
   # unpermitted attributes are ignored in production
   def user_params_without_password
     params.require(:user).permit(:email, :admin, :first_name, :last_name)
+  end
+
+  def password_update_requested?
+    user_params.key?(:password) && user_params[:password].present?
+  end
+
+  def update_user_password(user)
+    password_params = user_params.slice(:password, :password_confirmation)
+    if password_params[:password] == password_params[:password_confirmation]
+      user.password = password_params[:password]
+    end
   end
 end
