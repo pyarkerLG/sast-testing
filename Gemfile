@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 source "https://rubygems.org"
 
-#don't upgrade
-gem "rails", "6.0.0"
+# SECURITY UPDATE: Updated Rails from vulnerable 6.0.0 to secure 7.0.x series
+gem "rails", "~> 7.0.0"
 
 ruby "2.6.5"
 
@@ -11,8 +11,11 @@ gem "bcrypt"
 gem "coffee-rails"
 gem "execjs"
 gem "foreman"
+# SECURITY UPDATE: Updated frontend libraries to secure versions
 gem "jquery-fileupload-rails"
-gem "jquery-rails"
+gem "jquery-rails", "~> 4.6"  # Updated from vulnerable jQuery 1.8.3
+gem "bootstrap", "~> 5.3"      # Updated from vulnerable Bootstrap 2.2.2  
+gem "jquery-ui-rails", "~> 6.0" # Updated from vulnerable jQuery UI 1.8.23
 gem "minitest"
 gem "powder" # Pow related gem
 gem "pry-rails" # not in dev group in case running via prod/staging @ a training
