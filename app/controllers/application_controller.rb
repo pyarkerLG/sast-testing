@@ -16,10 +16,42 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||= (
-      User.find_by(auth_token: cookies[:auth_token].to_s) ||
-      User.find_by(id: session[:user_id].to_s)
-    )
+    @current_user ||= find_user_by_auth_token || find_user_by_session
+  end
+
+  def find_user_by_auth_token
+    return nil unless cookies[:auth_token].present?
+    
+    auth_token = cookies[:auth_token].to_s.strip
+    
+    # Validate auth_token format (should be Base64 encoded)
+    return nil unless auth_token.match?(/\A[A-Za-z0-9+\/]*={0,2}\z/)
+    
+    begin
+      # Attempt to decrypt and validate the auth_token
+      decrypted_id = Encryption.decrypt_sensitive_value(auth_token)
+      user_id = decrypted_id.to_i
+      
+      # Ensure the decrypted value is a valid positive integer
+      return nil unless user_id > 0 && decrypted_id == user_id.to_s
+      
+      User.find_by(id: user_id, auth_token: auth_token)
+    rescue => e
+      # Log the error for security monitoring but don't expose details
+      Rails.logger.warn "Invalid auth_token attempted: #{e.class}"
+      nil
+    end
+  end
+
+  def find_user_by_session
+    return nil unless session[:user_id].present?
+    
+    user_id = session[:user_id].to_s.strip
+    
+    # Validate user_id is a positive integer
+    return nil unless user_id.match?(/\A\d+\z/) && user_id.to_i > 0
+    
+    User.find_by(id: user_id.to_i)
   end
 
   def authenticated
