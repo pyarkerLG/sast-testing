@@ -3,7 +3,19 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authenticated
 
   def reset_password
-    user = Marshal.load(Base64.decode64(params[:user])) unless params[:user].nil?
+    user = nil
+    
+    # Safely extract user ID from signed token instead of deserializing user object
+    if params[:user_token].present?
+      begin
+        # Use Rails' signed cookies mechanism for secure token handling
+        user_id = Rails.application.message_verifier('password_reset').verify(params[:user_token])
+        user = User.find_by(id: user_id)
+      rescue ActiveSupport::MessageVerifier::InvalidSignature
+        # Invalid or tampered token
+        user = nil
+      end
+    end
 
     if user && params[:password] && params[:confirm_password] && params[:password] == params[:confirm_password]
       user.password = params[:password]
