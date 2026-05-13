@@ -8,11 +8,13 @@ class MessagesController < ApplicationController
   end
 
   def show
-    @message = Message.where(id: params[:id]).first
+    @message = current_user.messages.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to user_messages_path(user_id: current_user.id), alert: "Message not found."
   end
 
   def destroy
-    message = Message.where(id: params[:id]).first
+    message = current_user.messages.find(params[:id])
 
     if message.destroy
       flash[:success] = "Your message has been deleted."
@@ -20,6 +22,8 @@ class MessagesController < ApplicationController
     else
       flash[:error] = "Could not delete message."
     end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to user_messages_path(user_id: current_user.id), alert: "Message not found."
   end
 
   def create
