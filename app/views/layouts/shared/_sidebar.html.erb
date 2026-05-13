@@ -19,12 +19,12 @@
         	   	</a>
 				<ul>
             	  <li>
-            	    <%= link_to admin_dashboard_path(:admin_id => "1") do %>
+            	    <%= link_to admin_dashboard_path(:admin_id => current_user.id) do %>
 		        	    Manage Users
 		            <% end %>
             	  </li>
             	  <li>
-            	    <%= link_to admin_analytics_path(:admin_id => "1") do %>
+            	    <%= link_to admin_analytics_path(:admin_id => current_user.id) do %>
 		        	    View Analytics
 		            <% end %>
             	  </li>
