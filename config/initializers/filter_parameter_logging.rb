@@ -2,4 +2,4 @@
 # Be sure to restart your server when you modify this file.
 
 # Configure sensitive parameters which will be filtered from the log file.
-Rails.application.config.filter_parameters += [:password]
+Rails.application.config.filter_parameters += [:password, :bank_account_num, :bank_routing_num, :dd_percent]

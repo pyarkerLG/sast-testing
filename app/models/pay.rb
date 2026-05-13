@@ -12,7 +12,8 @@ class Pay < ApplicationRecord
   before_save :encrypt_bank_account_num
 
   def as_json
-    super(only: [:bank_account_num, :bank_routing_num, :percent_of_deposit, :id])
+    # Only expose non-sensitive data to prevent logging of sensitive financial information
+    super(only: [:percent_of_deposit, :id])
   end
 
   def encrypt_bank_account_num
