@@ -8,7 +8,13 @@
       var hashParam = location.hash.split("#")[1];
       var paramName = hashParam.split('=')[0];
       var paramValue = decodeURIComponent(hashParam.split('=')[1]);
-      document.write("<OPTION value=3>" + paramValue + "</OPTION>");
+      // HTML encode the parameter value to prevent XSS
+      var sanitizedValue = paramValue.replace(/&/g, '&amp;')
+                                   .replace(/</g, '&lt;')
+                                   .replace(/>/g, '&gt;')
+                                   .replace(/"/g, '&quot;')
+                                   .replace(/'/g, '&#x27;');
+      document.write("<OPTION value=3>" + sanitizedValue + "</OPTION>");
     } catch(err) {
     }
     //document.write("</select>");
