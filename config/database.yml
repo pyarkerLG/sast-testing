@@ -28,7 +28,13 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
-  pool: 5
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV['DATABASE_NAME'] || 'railsgoat_production' %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] || 'localhost' %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
+  sslmode: <%= ENV['DATABASE_SSL_MODE'] || 'require' %>
   timeout: 5000
