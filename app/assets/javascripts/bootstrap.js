@@ -1981,7 +1981,11 @@
 
   , highlighter: function (item) {
       var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-      return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+      // Escape HTML entities to prevent XSS
+      var escapedItem = item.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
+      // Escape query for regex matching against escaped content
+      var escapedQuery = this.query.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+      return escapedItem.replace(new RegExp('(' + escapedQuery + ')', 'ig'), function ($1, match) {
         return '<strong>' + match + '</strong>'
       })
     }
