@@ -234,6 +234,9 @@ $("#cal_update_submit").click(function(event) {
       url: "/schedule.json",
     data: valuesToSubmit,
     type: "POST",
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+    },
     success: function(response) {
     if (response.msg == "failure") {
       $('#failure').show(500).delay(1500).fadeOut();
