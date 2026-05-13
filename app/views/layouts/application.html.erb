@@ -8,14 +8,29 @@
   <!-- bootstrap css -->
 <%
 if cookies[:font]
+  # Map whitelisted font values to safe CSS classes
+  font_class = case cookies[:font]
+               when 'small'
+                 'font-small'
+               when 'medium'
+                 'font-medium'
+               when 'large'
+                 'font-large'
+               else
+                 'font-medium' # default fallback
+               end
 %>
-<style>body { font-size:<%= raw cookies[:font] %> !important;}</style>
+<style>
+  body.font-small { font-size: 12px !important; }
+  body.font-medium { font-size: 14px !important; }
+  body.font-large { font-size: 16px !important; }
+</style>
 <%
 end
 %>
 
 </head>
-<body>
+<body<% if cookies[:font] && ['small', 'medium', 'large'].include?(cookies[:font]) %> class="font-<%= cookies[:font] %>"<% end %>>
   <%= render "layouts/shared/header" %>
   <%= render "layouts/shared/sidebar" %>
 <div class="container-fluid">
