@@ -6,10 +6,31 @@
     //document.write("<OPTION value=2>Spanish</OPTION>");
     try {
       var hashParam = location.hash.split("#")[1];
-      var paramName = hashParam.split('=')[0];
-      var paramValue = decodeURIComponent(hashParam.split('=')[1]);
-      document.write("<OPTION value=3>" + paramValue + "</OPTION>");
+      if (hashParam) {
+        var paramName = hashParam.split('=')[0];
+        var paramValue = decodeURIComponent(hashParam.split('=')[1]);
+        
+        // Validate parameter name against allow-list
+        var allowedParams = ['lang', 'locale', 'language'];
+        if (allowedParams.indexOf(paramName) !== -1) {
+          // Validate parameter value against allow-list
+          var allowedValues = ['English', 'Spanish', 'French', 'German'];
+          if (allowedValues.indexOf(paramValue) !== -1) {
+            // Safely create and append option element
+            var option = document.createElement('option');
+            option.value = 3;
+            option.textContent = paramValue; // Use textContent to prevent HTML injection
+            
+            // Find or create select element to append to
+            var selectElement = document.querySelector('select');
+            if (selectElement) {
+              selectElement.appendChild(option);
+            }
+          }
+        }
+      }
     } catch(err) {
+      // Silently handle errors
     }
     //document.write("</select>");
   </script>
