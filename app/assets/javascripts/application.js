@@ -17,7 +17,7 @@
 //= require jquery.scrollUp.js
 //= require bootstrap.js
 //= require bootstrap-colorpicker.js
-//= require date-picker/date.js
+//= require moment.min.js
 //= require date-picker/daterangepicker.js
 //= require bootstrap-timepicker.js
 //= require jquery.bootstrap.wizard.js
