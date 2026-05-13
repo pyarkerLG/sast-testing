@@ -3,7 +3,15 @@ class Benefits < ApplicationRecord
 
   def self.save(file, backup = false)
     data_path = Rails.root.join("public", "data")
-    full_file_name = "#{data_path}/#{file.original_filename}"
+    # Sanitize filename to prevent path traversal attacks
+    sanitized_filename = File.basename(file.original_filename)
+    full_file_name = File.join(data_path, sanitized_filename)
+    
+    # Ensure the resolved path is still within the data directory
+    unless full_file_name.start_with?(data_path.to_s)
+      raise SecurityError, "Invalid file path detected"
+    end
+    
     f = File.open(full_file_name, "wb+")
     f.write file.read
     f.close
@@ -12,7 +20,10 @@ class Benefits < ApplicationRecord
 
   def self.make_backup(file, data_path, full_file_name)
     if File.exist?(full_file_name)
-      silence_streams(STDERR) { system("cp #{full_file_name} #{data_path}/bak#{Time.zone.now.to_i}_#{file.original_filename}") }
+      # Sanitize filename for backup to prevent path traversal
+      sanitized_filename = File.basename(file.original_filename)
+      backup_filename = File.join(data_path, "bak#{Time.zone.now.to_i}_#{sanitized_filename}")
+      silence_streams(STDERR) { system("cp #{full_file_name} #{backup_filename}") }
     end
   end
 
