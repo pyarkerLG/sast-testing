@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    path = params[:url].present? ? params[:url] : home_dashboard_index_path
+    path = safe_redirect_path(params[:url])
     begin
       # Normalize the email address, why not
       user = User.authenticate(params[:email].to_s.downcase, params[:password])
@@ -27,6 +27,27 @@ class SessionsController < ApplicationController
     else
       flash[:error] = e.message
       render "sessions/new"
+    end
+  end
+
+  private
+
+  def safe_redirect_path(url)
+    return home_dashboard_index_path if url.blank?
+    
+    # Parse the URL to check if it's safe
+    begin
+      uri = URI.parse(url)
+      
+      # Only allow relative paths (no scheme, no host)
+      if uri.scheme.nil? && uri.host.nil?
+        # Ensure the path starts with / to prevent protocol-relative URLs
+        url.start_with?('/') ? url : home_dashboard_index_path
+      else
+        home_dashboard_index_path
+      end
+    rescue URI::InvalidURIError
+      home_dashboard_index_path
     end
   end
 
