@@ -7,9 +7,9 @@
   <%#= csrf_meta_tags %> <!-- <~ What is this for? I hear it helps w/ JS and Sea-surfing.....whatevz -->
   <!-- bootstrap css -->
 <%
-if cookies[:font]
+if cookies[:font] && cookies[:font].match(/\A\d+(\.\d+)?(px|em|rem|%|pt|pc|in|cm|mm|ex|ch|vw|vh|vmin|vmax)\z/)
 %>
-<style>body { font-size:<%= raw cookies[:font] %> !important;}</style>
+<style>body { font-size:<%= cookies[:font] %> !important;}</style>
 <%
 end
 %>
