@@ -56,6 +56,31 @@ class ApplicationController < ActionController::Base
   end
 
   def sanitize_font(css)
-    css
+    # Only allow numeric values followed by px, rem, em, or %
+    # This prevents CSS injection and XSS attacks
+    return nil unless css.is_a?(String)
+    
+    # Remove any whitespace and convert to lowercase for validation
+    cleaned_css = css.strip.downcase
+    
+    # Allow only numeric values with safe CSS units
+    if cleaned_css.match(/\A\d+(\.\d+)?(px|rem|em|%)\z/)
+      # Additional safety check: limit font size to reasonable range
+      numeric_value = cleaned_css.match(/\A(\d+(?:\.\d+)?)/)[1].to_f
+      unit = cleaned_css.match(/(px|rem|em|%)\z/)[1]
+      
+      # Set reasonable limits based on unit type
+      case unit
+      when 'px'
+        return cleaned_css if numeric_value >= 8 && numeric_value <= 72
+      when 'rem', 'em'
+        return cleaned_css if numeric_value >= 0.5 && numeric_value <= 5.0
+      when '%'
+        return cleaned_css if numeric_value >= 50 && numeric_value <= 200
+      end
+    end
+    
+    # Return nil for invalid input, which will prevent style injection
+    nil
   end
 end

@@ -8,7 +8,8 @@ class DashboardController < ApplicationController
 
     # See if the user has a font preference
     if params[:font]
-      cookies[:font] = params[:font]
+      sanitized_font = sanitize_font(params[:font])
+      cookies[:font] = sanitized_font if sanitized_font
     end
   end
 
