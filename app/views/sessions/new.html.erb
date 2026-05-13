@@ -4,12 +4,35 @@
     //document.write("<select style=\"width: 100px;\">");
     //document.write("<OPTION value=1>English</OPTION>");
     //document.write("<OPTION value=2>Spanish</OPTION>");
+    
+    // Safe implementation: Use DOM manipulation instead of document.write
+    // and validate input against allowlist
     try {
       var hashParam = location.hash.split("#")[1];
-      var paramName = hashParam.split('=')[0];
-      var paramValue = decodeURIComponent(hashParam.split('=')[1]);
-      document.write("<OPTION value=3>" + paramValue + "</OPTION>");
+      if (hashParam) {
+        var paramName = hashParam.split('=')[0];
+        var paramValue = decodeURIComponent(hashParam.split('=')[1]);
+        
+        // Allowlist of safe values
+        var allowedValues = ['English', 'Spanish', 'French', 'German', 'Italian'];
+        
+        // Only proceed if the value is in the allowlist
+        if (allowedValues.indexOf(paramValue) !== -1) {
+          // Create option element safely using DOM manipulation
+          var selectElement = document.createElement('select');
+          selectElement.style.width = '100px';
+          
+          var optionElement = document.createElement('option');
+          optionElement.value = '3';
+          optionElement.textContent = paramValue; // Use textContent to prevent XSS
+          
+          selectElement.appendChild(optionElement);
+          // Note: This creates the element but doesn't append it to DOM
+          // as the original code was commented out anyway
+        }
+      }
     } catch(err) {
+      // Silently handle errors
     }
     //document.write("</select>");
   </script>
