@@ -6,16 +6,10 @@
   <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
   <%#= csrf_meta_tags %> <!-- <~ What is this for? I hear it helps w/ JS and Sea-surfing.....whatevz -->
   <!-- bootstrap css -->
-<%
-if cookies[:font]
-%>
-<style>body { font-size:<%= raw cookies[:font] %> !important;}</style>
-<%
-end
-%>
+
 
 </head>
-<body>
+<body class="<%= cookies[:font] if cookies[:font] %>">
   <%= render "layouts/shared/header" %>
   <%= render "layouts/shared/sidebar" %>
 <div class="container-fluid">

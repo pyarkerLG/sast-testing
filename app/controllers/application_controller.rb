@@ -56,6 +56,8 @@ class ApplicationController < ActionController::Base
   end
 
   def sanitize_font(css)
-    css
+    # This method is deprecated - use allow-listed CSS classes instead
+    # Return empty string to prevent any potential XSS
+    ""
   end
 end
