@@ -8,17 +8,22 @@ class MessagesController < ApplicationController
   end
 
   def show
-    @message = Message.where(id: params[:id]).first
+    @message = Message.where(id: params[:id])
+                      .where("creator_id = ? OR receiver_id = ?", current_user.id, current_user.id)
+                      .first
   end
 
   def destroy
-    message = Message.where(id: params[:id]).first
+    message = Message.where(id: params[:id])
+                     .where("creator_id = ? OR receiver_id = ?", current_user.id, current_user.id)
+                     .first
 
-    if message.destroy
+    if message&.destroy
       flash[:success] = "Your message has been deleted."
       redirect_to user_messages_path(user_id: current_user.id)
     else
       flash[:error] = "Could not delete message."
+      redirect_to user_messages_path(user_id: current_user.id)
     end
   end
 
