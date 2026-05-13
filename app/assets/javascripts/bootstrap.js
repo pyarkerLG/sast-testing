@@ -1,5 +1,5 @@
 /* ===================================================
- * bootstrap-transition.js v2.2.2
+ * bootstrap-transition.js v2.2.2 (SECURITY PATCHED)
  * http://twitter.github.com/bootstrap/javascript.html#transitions
  * ===================================================
  * Copyright 2012 Twitter, Inc.
@@ -15,6 +15,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * SECURITY PATCHES APPLIED:
+ * - Fixed XSS vulnerability in typeahead highlighter function
+ * - Fixed XSS vulnerability in tooltip setContent function
+ * - Fixed XSS vulnerability in popover setContent function
+ * - All HTML content is now properly escaped to prevent XSS attacks
  * ========================================================== */
 
 
@@ -932,7 +938,8 @@
       var $tip = this.tip()
         , title = this.getTitle()
 
-      $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+      // Always use text() to prevent XSS, regardless of html option
+      $tip.find('.tooltip-inner').text(title)
       $tip.removeClass('fade in top bottom left right')
     }
 
@@ -1108,8 +1115,9 @@
         , title = this.getTitle()
         , content = this.getContent()
 
-      $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
-      $tip.find('.popover-content')[this.options.html ? 'html' : 'text'](content)
+      // Always use text() to prevent XSS, regardless of html option
+      $tip.find('.popover-title').text(title)
+      $tip.find('.popover-content').text(content)
 
       $tip.removeClass('fade top bottom left right in')
     }
@@ -1981,8 +1989,10 @@
 
   , highlighter: function (item) {
       var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-      return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-        return '<strong>' + match + '</strong>'
+      // Escape HTML to prevent XSS
+      var escapedItem = $('<div>').text(item).html()
+      return escapedItem.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+        return '<strong>' + $('<div>').text(match).html() + '</strong>'
       })
     }
 
@@ -1991,6 +2001,7 @@
 
       items = $(items).map(function (i, item) {
         i = $(that.options.item).attr('data-value', item)
+        // Use html() safely since highlighter now escapes content
         i.find('a').html(that.highlighter(item))
         return i[0]
       })
