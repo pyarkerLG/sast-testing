@@ -49,11 +49,15 @@
   </div>
 </div>
 
-<script type="text/javascript">
+<!-- Google Charts JS with SRI -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js" 
+        integrity="sha384-b4/p/bccgCl1bXzhqzMt6Yk8tPNqEf/YrMeCNe6317CxyO57bluJ52677EB3+ZMNz" 
+        crossorigin="anonymous"></script>
 
- google.load("visualization", "1", {
-  packages: ["corechart"]
-});
+<script type="text/javascript">
+ // Load Google Charts with modern API
+ google.charts.load('current', {'packages':['corechart']});
+ google.charts.setOnLoadCallback(drawChart2);
 
 function drawChart2() {
   var data = google.visualization.arrayToDataTable([
@@ -119,7 +123,6 @@ function makeActive(){
 };
 
 $(document).ready(function () {
-  drawChart2(),
   makeActive()
 });
 
