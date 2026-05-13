@@ -55,7 +55,15 @@ class ApplicationController < ActionController::Base
     Analytics.create({ ip_address: request.remote_ip, referrer: request.referrer, user_agent: request.user_agent})
   end
 
-  def sanitize_font(css)
-    css
+  def sanitize_font(font_size)
+    # Whitelist of allowed font sizes
+    allowed_fonts = ['12px', '14px', '16px', '18px', '20px', '24px']
+    
+    # Return the font size if it's in the whitelist, otherwise return default
+    if allowed_fonts.include?(font_size)
+      font_size
+    else
+      '16px' # default font size
+    end
   end
 end
