@@ -20,7 +20,7 @@ class User < ApplicationRecord
   has_many :messages, foreign_key: :receiver_id, dependent: :destroy
 
   before_save :hash_password
-  after_create { generate_token(:auth_token) }
+  has_secure_token :auth_token
   before_create :build_benefits_data
 
   def build_benefits_data
@@ -56,12 +56,5 @@ class User < ApplicationRecord
     end
   end
 
-  def generate_token(column)
-    loop do
-      self[column] = Encryption.encrypt_sensitive_value(self.id)
-      break unless User.exists?(column => self[column])
-    end
 
-    self.save!
-  end
 end
