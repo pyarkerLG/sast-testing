@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class AdminController < ApplicationController
-  before_action :administrative, if: :admin_param, except: [:get_user]
+  before_action :administrative, except: [:get_user]
   skip_before_action :has_info
   layout false, only: [:get_all_users, :get_user]
 
@@ -32,8 +32,17 @@ class AdminController < ApplicationController
   end
 
   def update_user
-    user = User.find_by_id(params[:admin_id])
+    # Validate admin_id parameter to prevent parameter tampering
+    admin_id = params[:admin_id]
+    return render json: { msg: "failure" } if admin_id.blank?
+    
+    user = User.find_by_id(admin_id)
     if user
+      # Additional authorization check: ensure current user is admin
+      unless is_admin?
+        return render json: { msg: "failure" }
+      end
+      
       user.update(params[:user].reject { |k| k == ("password" || "password_confirmation") })
       pass = params[:user][:password]
       user.password = pass if !(pass.blank?)
@@ -64,8 +73,4 @@ class AdminController < ApplicationController
     params.require(:field).keys
   end
   helper_method :custom_fields
-
-  def admin_param
-    params[:admin_id] != "1"
-  end
 end
