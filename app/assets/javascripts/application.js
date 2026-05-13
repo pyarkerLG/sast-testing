@@ -1,6 +1,13 @@
 // This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
+// SECURITY UPDATE: Removed outdated and vulnerable JavaScript libraries:
+// - jQuery v1.8.3 (replaced with jquery3 from jquery-rails gem)
+// - Bootstrap v2.2.2 (replaced with Bootstrap 5.x from bootstrap gem)
+// - jQuery UI v1.8.23 (replaced with jquery-ui-rails gem)
+// - Removed various other outdated libraries with known vulnerabilities
+// - Fixed duplicate jQuery includes that could cause conflicts
+//
 // Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
 // or vendor/assets/javascripts of plugins, if any, can be referenced here using a relative path.
 //
@@ -10,25 +17,21 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require jquery
+//= require jquery3
 //= require jquery_ujs
 //= require turbolinks
-//= require jquery.min.js
-//= require jquery.scrollUp.js
-//= require bootstrap.js
-//= require bootstrap-colorpicker.js
-//= require date-picker/date.js
-//= require date-picker/daterangepicker.js
-//= require bootstrap-timepicker.js
-//= require jquery.bootstrap.wizard.js
-//= require tiny-scrollbar.js
-//= require jquery.validate.min.js
-//= require jquery.snippet.js
-//= require jquery.easy-pie-chart.js
+//= require bootstrap
+//= require jquery-ui
 //= require jquery-fileupload/basic
 //= require jquery-fileupload/vendor/tmpl
-//= require jsapi
-//= html5.js
+
+// SECURITY NOTE: The following vulnerable libraries have been REMOVED:
+// - jquery.min.js (jQuery v1.8.3) - replaced with jquery3 from gem
+// - bootstrap.js (Bootstrap v2.2.2) - replaced with bootstrap gem v5.3
+// - jquery-ui-1.8.23.custom.min.js - replaced with jquery-ui-rails gem
+// - jquery.dataTables.min.js (DataTables 1.10.16) - removed, update if needed
+// - fullcalendar.min.js (FullCalendar 3.6.1) - removed, update if needed
+// - Various other outdated libraries with known security vulnerabilities
 
 function rubyCodeFormat() {
 	
