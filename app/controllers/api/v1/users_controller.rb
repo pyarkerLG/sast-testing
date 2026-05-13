@@ -29,16 +29,10 @@ class Api::V1::UsersController < ApplicationController
     # We've had issues with URL encoding, etc. causing issues so just to be safe
     # we will go ahead and unescape the user's token
     unescape_token(token)
-    @clean_token =~ /(.*?)-(.*)/
-    id = $1
-    hash = $2
-
-    check_hash(id, hash)
-  end
-
-  def check_hash(id, hash)
-    digest = OpenSSL::Digest::SHA1.hexdigest("#{ACCESS_TOKEN_SALT}:#{id}")
-    hash == digest
+    
+    # Use secure auth_token validation instead of predictable SHA1 hash
+    @user = User.find_by(auth_token: @clean_token)
+    return !@user.nil?
   end
 
   # We had some issues with the token and url encoding...
@@ -49,6 +43,8 @@ class Api::V1::UsersController < ApplicationController
 
   # Added a method to make it easy to figure out who the user is.
   def extrapolate_user
-    @user = User.find_by_id(@clean_token.split("-").first)
+    # User is already identified in identify_user method via auth_token
+    # No need to extract from token format since we're using secure tokens
+    return @user
   end
 end
