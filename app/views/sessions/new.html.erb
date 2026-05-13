@@ -6,9 +6,21 @@
     //document.write("<OPTION value=2>Spanish</OPTION>");
     try {
       var hashParam = location.hash.split("#")[1];
-      var paramName = hashParam.split('=')[0];
-      var paramValue = decodeURIComponent(hashParam.split('=')[1]);
-      document.write("<OPTION value=3>" + paramValue + "</OPTION>");
+      if (hashParam && hashParam.includes('=')) {
+        var paramName = hashParam.split('=')[0];
+        var paramValue = decodeURIComponent(hashParam.split('=')[1]);
+        
+        // Create option element safely without using document.write
+        var option = document.createElement('option');
+        option.value = '3';
+        option.textContent = paramValue; // Use textContent to prevent XSS
+        
+        // Find a select element to append to (if one exists)
+        var selectElement = document.querySelector('select');
+        if (selectElement) {
+          selectElement.appendChild(option);
+        }
+      }
     } catch(err) {
     }
     //document.write("</select>");
