@@ -3,6 +3,10 @@
 # The data can then be loaded with the rails db:seed (or created alongside the db with db:setup).
 #
 
+# Only seed data in development and test environments to prevent plaintext passwords in production
+unless Rails.env.production?
+  puts "Seeding database for #{Rails.env} environment..."
+
 users = [
   {
     email: "admin@metacorp.com",
@@ -308,4 +312,9 @@ end
 work_info.each do |wi|
   wi[:user_id] = user_map.fetch(wi.delete(:user))
   WorkInfo.create!(wi)
+end
+
+  puts "Database seeded successfully for #{Rails.env} environment."
+else
+  puts "Skipping database seeding in production environment for security reasons."
 end
