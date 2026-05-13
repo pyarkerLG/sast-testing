@@ -12,6 +12,8 @@ class PaidTimeOff < ApplicationRecord
   end
 
   def sick_days_taken_percentage
-    result = self.sick_days_taken.to_f /  self.sick_days_earned.to_f * 100.0
+    earned = self.sick_days_earned.to_f
+    return 0.0 if earned <= 0
+    (self.sick_days_taken.to_f / earned) * 100.0
   end
 end
