@@ -20,9 +20,32 @@ class User < ApplicationRecord
   has_many :messages, foreign_key: :receiver_id, dependent: :destroy
 
   before_save :hash_password
-  after_create { generate_token(:auth_token) }
   before_create :build_benefits_data
-
+  
+  # Secure API token with expiration
+  has_secure_token :auth_token
+  
+  # Set token creation timestamp when token is generated
+  after_update :set_auth_token_created_at, if: :saved_change_to_auth_token?
+  
+  # Token expires after 24 hours
+  def token_expired?
+    return true unless auth_token_created_at
+    auth_token_created_at < 24.hours.ago
+  end
+  
+  # Generate new API token and set creation timestamp
+  def regenerate_auth_token!
+    regenerate_auth_token
+    update_column(:auth_token_created_at, Time.current)
+  end
+  
+  # Validate API token and check expiration
+  def valid_auth_token?(token)
+    return false if token_expired?
+    auth_token == token
+  end
+  
   def build_benefits_data
     build_retirement(POPULATE_RETIREMENTS.sample)
     build_paid_time_off(POPULATE_PAID_TIME_OFF.sample).schedule.build(POPULATE_SCHEDULE.sample)
@@ -55,13 +78,10 @@ class User < ApplicationRecord
       self.password = Digest::MD5.hexdigest(self.password)
     end
   end
-
-  def generate_token(column)
-    loop do
-      self[column] = Encryption.encrypt_sensitive_value(self.id)
-      break unless User.exists?(column => self[column])
-    end
-
-    self.save!
+  
+  def set_auth_token_created_at
+    update_column(:auth_token_created_at, Time.current) if auth_token.present?
   end
+
+
 end

@@ -1,4 +1,4 @@
 # frozen_string_literal: true
-ACCESS_TOKEN_SALT = "S4828341189aefiasd#ASDF"
+# ACCESS_TOKEN_SALT removed - replaced with secure token system
 
 RG_IV = "PPKLKAJDKGHALDJL482823458028"
