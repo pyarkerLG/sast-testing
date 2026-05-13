@@ -26,7 +26,14 @@ class UsersController < ApplicationController
   def update
     message = false
 
-    user = User.where("id = '#{params[:user][:id]}'")[0]
+    user = User.find_by(id: params[:user][:id])
+
+    # Ensure users can only update their own account unless they are admin
+    unless user && (user.id == current_user.id || is_admin?)
+      flash[:error] = "Unauthorized to update this user!"
+      redirect_to user_account_settings_path(user_id: current_user.id)
+      return
+    end
 
     if user
       user.update(user_params_without_password)
@@ -47,11 +54,11 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit!
+    params.require(:user).permit(:email, :first_name, :last_name, :password, :password_confirmation)
   end
 
   # unpermitted attributes are ignored in production
   def user_params_without_password
-    params.require(:user).permit(:email, :admin, :first_name, :last_name)
+    params.require(:user).permit(:email, :first_name, :last_name)
   end
 end
