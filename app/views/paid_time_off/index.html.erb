@@ -118,12 +118,14 @@
   </div>
 </div>
 
-<%= javascript_include_tag "moment.min.js" %>
-<%= javascript_include_tag "fullcalendar.min.js" %>
+<!-- FullCalendar v6 CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+<!-- FullCalendar v6 JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
 <script type="text/javascript">
 
-
+var calendar; // Global calendar variable
 
 function makeActive(){
   $('li[id="pto"]').addClass('active');
@@ -131,9 +133,17 @@ function makeActive(){
 
 
 $(document).ready(function() {
-  $('#calendar').fullCalendar({
-        events: <%= get_pto_schedule_schedule_index_path(:format => "json").inspect.html_safe %>,
+  var calendarEl = document.getElementById('calendar');
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    events: <%= get_pto_schedule_schedule_index_path(:format => "json").inspect.html_safe %>,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    initialView: 'dayGridMonth'
   });
+  calendar.render();
 });
 
 
@@ -239,7 +249,7 @@ $("#cal_update_submit").click(function(event) {
       $('#failure').show(500).delay(1500).fadeOut();
     } else {
       $('#success').show(500).delay(1500).fadeOut();
-      $('#calendar').fullCalendar('refetchEvents')
+      calendar.refetchEvents()
     }
     },
     error: function(event) {
