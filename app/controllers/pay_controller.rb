@@ -26,7 +26,7 @@ class PayController < ApplicationController
   end
 
   def destroy
-    pay = Pay.find_by_id(params[:id])
+    pay = current_user.pay.find_by_id(params[:id])
     if pay.present? and pay.destroy
       flash[:success] = "Successfully Deleted Entry"
     else
