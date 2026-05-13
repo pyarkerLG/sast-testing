@@ -28,7 +28,14 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
-  pool: 5
+  adapter: postgresql
+  database: <%= ENV['DATABASE_NAME'] || 'production_app' %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] || 'localhost' %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
+  pool: <%= ENV['DATABASE_POOL'] || 5 %>
   timeout: 5000
+  sslmode: require
+  connect_timeout: 10
+  checkout_timeout: 5
