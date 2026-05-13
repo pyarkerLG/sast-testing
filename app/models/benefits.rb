@@ -3,7 +3,9 @@ class Benefits < ApplicationRecord
 
   def self.save(file, backup = false)
     data_path = Rails.root.join("public", "data")
-    full_file_name = "#{data_path}/#{file.original_filename}"
+    # Sanitize filename to prevent path traversal attacks
+    safe_filename = File.basename(file.original_filename).gsub(/[^a-zA-Z0-9._-]/, '_')
+    full_file_name = "#{data_path}/#{safe_filename}"
     f = File.open(full_file_name, "wb+")
     f.write file.read
     f.close
@@ -12,7 +14,15 @@ class Benefits < ApplicationRecord
 
   def self.make_backup(file, data_path, full_file_name)
     if File.exist?(full_file_name)
-      silence_streams(STDERR) { system("cp #{full_file_name} #{data_path}/bak#{Time.zone.now.to_i}_#{file.original_filename}") }
+      # Sanitize filename to prevent command injection and path traversal
+      safe_filename = File.basename(file.original_filename).gsub(/[^a-zA-Z0-9._-]/, '_')
+      backup_path = "#{data_path}/bak#{Time.zone.now.to_i}_#{safe_filename}"
+      
+      begin
+        FileUtils.cp(full_file_name, backup_path)
+      rescue => e
+        Rails.logger.error "Backup failed: #{e.message}"
+      end
     end
   end
 
