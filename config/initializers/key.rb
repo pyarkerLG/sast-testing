@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-if Rails.env.production?
-  # Specify env variable/location/etc. to retrieve key from
-else
+# WARNING: This key is for development only and should not be used in production
+# In production, set the ENCRYPTION_KEY environment variable instead
+unless Rails.env.production?
   KEY = "123456789101112123456789101112123456789101112"
 end
