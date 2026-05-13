@@ -131,9 +131,16 @@ function makeActive(){
 
 
 $(document).ready(function() {
-  $('#calendar').fullCalendar({
-        events: <%= get_pto_schedule_schedule_index_path(:format => "json").inspect.html_safe %>,
+  // FullCalendar v5+ initialization
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    events: <%= get_pto_schedule_schedule_index_path(:format => "json").inspect.html_safe %>,
+    initialView: 'dayGridMonth'
   });
+  calendar.render();
+  
+  // Store calendar instance globally for refetch functionality
+  window.ptoCalendar = calendar;
 });
 
 
@@ -239,7 +246,10 @@ $("#cal_update_submit").click(function(event) {
       $('#failure').show(500).delay(1500).fadeOut();
     } else {
       $('#success').show(500).delay(1500).fadeOut();
-      $('#calendar').fullCalendar('refetchEvents')
+      // FullCalendar v5+ refetch events
+      if (window.ptoCalendar) {
+        window.ptoCalendar.refetchEvents();
+      }
     }
     },
     error: function(event) {
