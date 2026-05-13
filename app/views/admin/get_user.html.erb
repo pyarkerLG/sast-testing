@@ -80,7 +80,7 @@ $('#delete_button').click(function() {
   $("#editAcct").modal('hide');
 
   $.ajax({
-      url: "/admin/" +  <%= params[:admin_id] %> + "/delete_user.json",
+      url: "/admin/" +  <%= j(params[:admin_id]) %> + "/delete_user.json",
     type: "POST",
     success: function(response) {
       $('#success').show(500).delay(1500).fadeOut();
