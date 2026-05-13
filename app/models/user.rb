@@ -40,8 +40,18 @@ class User < ApplicationRecord
 
   def self.authenticate(email, password)
     auth = nil
-    user = find_by_email(email)
-    raise "#{email} doesn't exist!" if !(user)
+    
+    # Validate and sanitize email input to prevent parameter tampering
+    return nil if email.blank? || password.blank?
+    
+    # Ensure email format is valid to prevent injection attacks
+    return nil unless email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i)
+    
+    # Sanitize email by stripping whitespace and converting to lowercase
+    sanitized_email = email.to_s.strip.downcase
+    
+    user = find_by_email(sanitized_email)
+    raise "#{sanitized_email} doesn't exist!" if !(user)
     if user.password == Digest::MD5.hexdigest(password)
       auth = user
     else
