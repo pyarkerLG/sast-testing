@@ -77,11 +77,26 @@
                 options.index = 0;
             }
         },
+        isValidUrl: function (url) {
+            if (!url || typeof url !== 'string') {
+                return false;
+            }
+            // Prevent javascript:, data:, vbscript:, and other dangerous protocols
+            var dangerousProtocols = /^(javascript|data|vbscript|file|ftp):/i;
+            if (dangerousProtocols.test(url)) {
+                return false;
+            }
+            // Only allow http, https, and relative URLs
+            var allowedProtocols = /^(https?:\/\/|\/)/;
+            return allowedProtocols.test(url) || !/^[a-z][a-z0-9+.-]*:/i.test(url);
+        },
         getUrl: function (element) {
-            return element.href || $(element).data('href');
+            var url = element.href || $(element).data('href');
+            return this.isValidUrl(url) ? url : null;
         },
         getDownloadUrl: function (element) {
-            return $(element).data('download');
+            var url = $(element).data('download');
+            return this.isValidUrl(url) ? url : null;
         },
         startSlideShow: function () {
             var $this = this;
@@ -112,11 +127,15 @@
             var options = this.options,
                 range = options.index + options.preloadRange + 1,
                 link,
+                url,
                 i;
             for (i = options.index - options.preloadRange; i < range; i += 1) {
                 link = this.$links[i];
                 if (link && i !== options.index) {
-                    $('<img>').prop('src', this.getUrl(link));
+                    url = this.getUrl(link);
+                    if (url) {
+                        $('<img>').prop('src', url);
+                    }
                 }
             }
         },
@@ -127,6 +146,13 @@
                 url = this.getUrl(this.$links[index]),
                 download = this.getDownloadUrl(this.$links[index]),
                 oldImg;
+            
+            // If URL is invalid, don't proceed with loading
+            if (!url) {
+                modal.trigger('error');
+                return;
+            }
+            
             this.abortLoad();
             this.stopSlideShow();
             modal.trigger('beforeLoad');
@@ -141,10 +167,16 @@
                 oldImg.remove();
             }, 3000);
             modal.find('.modal-title').text(this.$links[index].title);
-            modal.find('.modal-download').prop(
-                'href',
-                download || url
-            );
+            
+            // Only set download href if we have a valid download URL
+            var downloadElement = modal.find('.modal-download');
+            if (download || url) {
+                downloadElement.prop('href', download || url);
+                downloadElement.show();
+            } else {
+                downloadElement.hide();
+            }
+            
             this._loadingImage = loadImage(
                 url,
                 function (img) {
