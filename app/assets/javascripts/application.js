@@ -13,7 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require jquery.min.js
 //= require jquery.scrollUp.js
 //= require bootstrap.js
 //= require bootstrap-colorpicker.js
