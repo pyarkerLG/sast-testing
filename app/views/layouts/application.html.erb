@@ -8,9 +8,13 @@
   <!-- bootstrap css -->
 <%
 if cookies[:font]
+  # Additional validation: ensure the font value is safe for CSS context
+  valid_font_sizes = ['12px', '14px', '16px', '18px', '20px', '22px', '24px']
+  if valid_font_sizes.include?(cookies[:font])
 %>
-<style>body { font-size:<%= raw cookies[:font] %> !important;}</style>
+<style>body { font-size:<%= cookies[:font] %> !important;}</style>
 <%
+  end
 end
 %>
 
