@@ -37,7 +37,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def check_hash(id, hash)
-    digest = OpenSSL::Digest::SHA1.hexdigest("#{ACCESS_TOKEN_SALT}:#{id}")
+    digest = OpenSSL::Digest::SHA256.hexdigest("#{ACCESS_TOKEN_SALT}:#{id}")
     hash == digest
   end
 
