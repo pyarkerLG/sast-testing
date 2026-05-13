@@ -7,3 +7,12 @@ ADD Gemfile.lock /myapp/Gemfile.lock
 RUN bundle install
 ADD . /myapp
 
+# Create a non-root user to run the application
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Change ownership of the application directory to the non-root user
+RUN chown -R appuser:appuser /myapp
+
+# Switch to the non-root user
+USER appuser
+
