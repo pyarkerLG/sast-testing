@@ -36,9 +36,11 @@ class PayController < ApplicationController
   end
 
   def decrypted_bank_acct_num
-    decrypted = Encryption.decrypt_sensitive_value(params[:value_to_decrypt])
+    # Security fix: Remove decryption oracle vulnerability
+    # This endpoint was allowing arbitrary decryption of ciphertext
+    # which could be exploited to decrypt sensitive data
     respond_to do |format|
-      format.json { render json: {account_num: decrypted || "No Data" } }
+      format.json { render json: {error: "This endpoint has been disabled for security reasons" }, status: :forbidden }
     end
   end
 end
