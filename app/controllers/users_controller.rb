@@ -26,7 +26,17 @@ class UsersController < ApplicationController
   def update
     message = false
 
-    user = User.where("id = '#{params[:user][:id]}'")[0]
+    # Fix SQL injection by using parameterized query and ensure authorization
+    user_id = params[:user][:id]
+    
+    # Authorization check: users can only update their own records
+    unless current_user.id.to_s == user_id.to_s
+      flash[:error] = "Unauthorized access!"
+      redirect_to user_account_settings_path(user_id: current_user.id)
+      return
+    end
+
+    user = User.find_by(id: user_id)
 
     if user
       user.update(user_params_without_password)
@@ -52,6 +62,7 @@ class UsersController < ApplicationController
 
   # unpermitted attributes are ignored in production
   def user_params_without_password
-    params.require(:user).permit(:email, :admin, :first_name, :last_name)
+    # Remove :admin from permitted parameters to prevent privilege escalation
+    params.require(:user).permit(:email, :first_name, :last_name)
   end
 end
