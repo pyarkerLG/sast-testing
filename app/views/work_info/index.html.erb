@@ -27,10 +27,7 @@
                     <td><%= @user.work_info.income %></td>
                     <td><%= @user.work_info.bonuses %></td>
                     <td><%= @user.work_info.years_worked %></td>
-            <td class="ssn"><%= @user.work_info.SSN %></td>
-            <!-- Begin Secure Version>-->
-            <!--<td class="ssn"><%#= @user.work_info.last_four %></td>-->
-            <!-- End Secure Version -->
+            <td class="ssn"><%= @user.work_info.last_four %></td>
             <td><%= @user.work_info.DoB %></td>
                   </tr>
 
@@ -45,19 +42,13 @@
 
 <script type="text/javascript">
 
-// This should be an EXCELLENT feature!!!
-function maskSSN(){
-  var fullSSN = $("td.ssn").html().replace(/\d{3}.*?\d{2}/, "*****");
-  $("td.ssn").html(fullSSN);
 
-}
 
 function makeActive(){
   $('li[id="employee_info"]').addClass('active');
 };
 
 $(document).ready(function () {
-   maskSSN(),
    makeActive()
 });
 
