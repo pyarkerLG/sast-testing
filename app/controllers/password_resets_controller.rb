@@ -3,7 +3,13 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authenticated
 
   def reset_password
-    user = Marshal.load(Base64.decode64(params[:user])) unless params[:user].nil?
+    user = nil
+    
+    # Validate the secure token and fetch user by ID
+    if params[:user_token] && is_valid_reset_token?(params[:user_token])
+      user_id = extract_user_id_from_token(params[:user_token])
+      user = User.find_by(id: user_id) if user_id
+    end
 
     if user && params[:password] && params[:confirm_password] && params[:password] == params[:confirm_password]
       user.password = params[:password]
@@ -18,6 +24,8 @@ class PasswordResetsController < ApplicationController
 
   def confirm_token
     if !params[:token].nil? && is_valid?(params[:token])
+      # Generate a secure token for the password reset form
+      @user_token = generate_reset_token(@user.id)
       flash[:success] = "Password reset token confirmed! Please create a new password."
       render "password_resets/reset_password"
     else
@@ -58,6 +66,37 @@ class PasswordResetsController < ApplicationController
 
       # Compare and validate our hashes
       return true if email == $~[:email_hash]
+    end
+  end
+
+  def generate_reset_token(user_id)
+    # Generate a secure token using Rails' MessageVerifier for tamper-proof tokens
+    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
+    data = { user_id: user_id, expires_at: 1.hour.from_now.to_i }
+    verifier.generate(data)
+  end
+
+  def is_valid_reset_token?(token)
+    begin
+      verifier = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
+      data = verifier.verify(token)
+      
+      # Check if token has expired
+      return false if data[:expires_at] < Time.current.to_i
+      
+      return true
+    rescue ActiveSupport::MessageVerifier::InvalidSignature
+      return false
+    end
+  end
+
+  def extract_user_id_from_token(token)
+    begin
+      verifier = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
+      data = verifier.verify(token)
+      return data[:user_id]
+    rescue ActiveSupport::MessageVerifier::InvalidSignature
+      return nil
     end
   end
 end
