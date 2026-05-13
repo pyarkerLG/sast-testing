@@ -8,9 +8,20 @@
   <!-- bootstrap css -->
 <%
 if cookies[:font]
+  # Map whitelisted font keys to safe CSS values
+  allowed_fonts = {
+    'small' => '12px',
+    'medium' => '16px', 
+    'large' => '20px',
+    'extra-large' => '24px'
+  }
+  
+  font_size = allowed_fonts[cookies[:font]]
+  if font_size
 %>
-<style>body { font-size:<%= raw cookies[:font] %> !important;}</style>
+<style>body { font-size:<%= font_size %> !important;}</style>
 <%
+  end
 end
 %>
 
