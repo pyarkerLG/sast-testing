@@ -37,8 +37,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def check_hash(id, hash)
-    digest = OpenSSL::Digest::SHA1.hexdigest("#{ACCESS_TOKEN_SALT}:#{id}")
-    hash == digest
+    # Use HMAC-SHA256 instead of SHA1 with static salt for secure token verification
+    expected_hash = OpenSSL::HMAC.hexdigest('SHA256', ACCESS_TOKEN_SALT, id.to_s)
+    # Use timing-safe comparison to prevent timing attacks
+    ActiveSupport::SecurityUtils.secure_compare(hash.to_s, expected_hash)
   end
 
   # We had some issues with the token and url encoding...
