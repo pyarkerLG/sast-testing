@@ -76,5 +76,14 @@ function hoganEscape(str) {
   }
 
 $(document).ready(function(){
-	rubyCodeFormat()
+	rubyCodeFormat();
+	
+	// Setup CSRF token for all AJAX requests
+	$.ajaxSetup({
+		beforeSend: function(xhr, settings) {
+			if (!(/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) && !this.crossDomain) {
+				xhr.setRequestHeader('X-CSRF-Token', $('meta[name=csrf-token]').attr('content'));
+			}
+		}
+	});
 });
