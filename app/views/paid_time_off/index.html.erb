@@ -143,16 +143,24 @@ $('.date_picker').daterangepicker({
   opens: 'right'
 });
 
- $(document).ready(function () {
-   drawChart1(),
-   drawChart2(),
-   resizeTopWidgets(),
-   makeActive()
-  });
+<!-- Google Charts JS with SRI -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js" 
+        integrity="sha384-b4/p/bccgCl1bXzhqzMt6Yk8tPNqEf/YrMeCNe6317CxyO57bluJ52677EB3+ZMNz" 
+        crossorigin="anonymous"></script>
 
-   google.load("visualization", "1", {
-      packages: ["corechart"]
-    });
+<script type="text/javascript">
+   // Load Google Charts with modern API
+   google.charts.load('current', {'packages':['corechart']});
+   google.charts.setOnLoadCallback(function() {
+     drawChart1();
+     drawChart2();
+   });
+
+   $(document).ready(function () {
+     resizeTopWidgets();
+     makeActive();
+   });
+</script>
 
 function drawChart1() {
     var data = google.visualization.arrayToDataTable([
