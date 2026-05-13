@@ -61,10 +61,10 @@
 			// if the node is indeed a <pre> element...
 			if(node == "pre"){
 				
-				// saves the original html as a data on the node
-				if(o.data('orgHtml')==undefined || o.data('orgHtml')==null){
-					var orgHtml = o.html();
-					o.data('orgHtml',orgHtml);
+				// saves the original text content as a data on the node
+				if(o.data('orgText')==undefined || o.data('orgText')==null){
+					var orgText = o.text();
+					o.data('orgText',orgText);
 				}
 				
 				// if node IS NOT an existing Snippet...
@@ -127,7 +127,7 @@
 					});
 					
 					// builds text-only view and hover menu
-					var txtOnly = "<pre class='snippet-textonly sh_sourceCode' style='display:none;'>"+o.data('orgHtml')+"</pre>";
+					var txtOnly = "<pre class='snippet-textonly sh_sourceCode' style='display:none;'>"+escapeHtml(o.data('orgText'))+"</pre>";
 					var controls = "<div class='snippet-menu sh_sourceCode' style='display:none;'><pre>"
 								  +"<a class='snippet-copy' href='#'>copy</a>"
 								  +"<a class='snippet-text' href='#'>text</a>"
@@ -179,7 +179,7 @@
 					
 					// click event for popup view
 					o.parent().find("a.snippet-window").click(function(){
-						var txt = $(this).parents('.snippet-wrap').find('.snippet-textonly').html();
+						var txt = $(this).parents('.snippet-wrap').find('.snippet-textonly').text();
 						snippetPopup(txt);
 						$(this).blur();
 						return false;
@@ -387,6 +387,18 @@
 })(jQuery);
 
 
+// HTML escape function to prevent XSS
+function escapeHtml(text) {
+	var map = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#039;'
+	};
+	return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 // snippet new window popup function
 function snippetPopup(content) {
 	 top.consoleRef=window.open('','myconsole',
@@ -399,9 +411,9 @@ function snippetPopup(content) {
 	   +',scrollbars=1'
 	   +',resizable=1');
 	 top.consoleRef.document.writeln(
-	  '<html><head><title>Snippet :: Code View :: '+location.href+'</title></head>'
+	  '<html><head><title>Snippet :: Code View :: '+escapeHtml(location.href)+'</title></head>'
 	   +'<body bgcolor=white onLoad="self.focus()">'
-	   +'<pre>'+content+'</pre>'
+	   +'<pre>'+escapeHtml(content)+'</pre>'
 	   +'</body></html>'
 	 );
 	 top.consoleRef.document.close();
