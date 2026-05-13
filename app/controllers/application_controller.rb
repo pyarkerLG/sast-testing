@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class ApplicationController < ActionController::Base
-  before_action :authenticated, :has_info, :create_analytic, :mailer_options
+  before_action :authenticated, :has_info, :create_analytic, :mailer_options, :set_csp_header
   helper_method :current_user, :is_admin?, :sanitize_font
 
   # Our security guy keep talking about sea-surfing, cool story bro.
@@ -57,5 +57,9 @@ class ApplicationController < ActionController::Base
 
   def sanitize_font(css)
     css
+  end
+
+  def set_csp_header
+    response.headers['Content-Security-Policy'] = "script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';"
   end
 end

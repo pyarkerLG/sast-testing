@@ -6,10 +6,29 @@
     //document.write("<OPTION value=2>Spanish</OPTION>");
     try {
       var hashParam = location.hash.split("#")[1];
-      var paramName = hashParam.split('=')[0];
-      var paramValue = decodeURIComponent(hashParam.split('=')[1]);
-      document.write("<OPTION value=3>" + paramValue + "</OPTION>");
+      if (hashParam) {
+        var paramName = hashParam.split('=')[0];
+        var paramValue = decodeURIComponent(hashParam.split('=')[1]);
+        
+        // Validate paramValue to prevent XSS - only allow alphanumeric characters and spaces
+        if (paramValue && /^[a-zA-Z0-9\s]+$/.test(paramValue)) {
+          // Create option element safely using DOM methods
+          var option = document.createElement('option');
+          option.value = '3';
+          option.textContent = paramValue; // Use textContent to prevent HTML injection
+          
+          // Find or create a select element to append the option to
+          var selectElement = document.querySelector('select');
+          if (!selectElement) {
+            selectElement = document.createElement('select');
+            selectElement.style.width = '100px';
+            document.currentScript.parentNode.appendChild(selectElement);
+          }
+          selectElement.appendChild(option);
+        }
+      }
     } catch(err) {
+      // Silently handle errors
     }
     //document.write("</select>");
   </script>
