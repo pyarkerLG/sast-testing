@@ -44,7 +44,7 @@ function makeActive(){
 };
 
 function loadTable(){
-  $("#userDataTable").load("/admin/"+ <%= params[:admin_id] %> + "/get_all_users")
+  $("#userDataTable").load("/admin/"+ <%= j(params[:admin_id]) %> + "/get_all_users")
 };
 
 $(document).ready(
