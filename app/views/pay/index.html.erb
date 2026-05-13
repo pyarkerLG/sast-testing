@@ -115,34 +115,7 @@
     <!-- End Dynamic Table ColSpan Table -->
     <!-- ###################-->
 
-    <!-- Begin Row-Fluid for Decryption Input -->
-    <div class="row-fluid">
-        <div class="span9">
-              <div class="widget">
-                <div class="widget-header">
-                  <div class="title">
-                    <span class="fs1" aria-hidden="true" data-icon="&#xe11b;"></span> Decrypt Bank Account Number
-                  </div>
-                </div>
-                <div class="widget-body">
-          <div class="row-fluid">
-            <%= form_tag "#", {:class => "form-horizontal", :id => "decrypt_form" } do %>
-              <!-- Begin inputs-->
 
-                <div class="input-append">
-                  <%= text_field_tag :value_to_decrypt, params[:value_to_decrypt], {:placeholder => "Bank Account Number"} %>
-                  <span class="add-on">#</span>
-                </div>
-
-              <!-- End Inputs -->
-              <%= submit_tag "Submit", {:id => "decrypt_btn", :style => "margin-left: 10px;", :class => "btn btn-medium btn-primary"} %>
-            <% end %>
-          </div>
-                </div>
-              </div>
-            </div>
-    </div>
-    <!-- Row-Fluid for Decryption Input -->
   </div>
 </div>
 
@@ -218,37 +191,7 @@ $('.delete-row').click(function () {
     return false;
 });
 
-/*
-  decryptShow parses the json response from the application and then renders
-  a decrypted version of the user's account number
-*/
-function decryptShow(response){
-  var msg = jQuery.parseJSON(JSON.stringify(response));
-  alert("Decrypted Account Number: " + msg.account_num);
-};
 
-/*
-  This function overrides the decrypt buttons (submit button's) native behavior,
-  allowing an ajax call to be made with the decrypt_form's inputs which is decrypted
-  server side with a JSON response containing the decrypted value. The decrypted value is
-  then passed to decryptShow();
-*/
-$("#decrypt_btn").click(function(event){
-  var valuesToSubmit = $("#decrypt_form").serialize();
-  event.preventDefault();
-  $.ajax({
-      url: <%= sanitize(decrypted_bank_acct_num_user_pay_index_path(:format => "json", user_id: current_user.id).inspect) %>,
-    data: valuesToSubmit,
-    type: "POST",
-    success: function(response) {
-    $('#success').show(500).delay(1500).fadeOut();
-    decryptShow(response);
-    },
-    error: function(event) {
-    $('#failure').show(500).delay(1500).fadeOut();
-    }
-  });
-});
 
 /*
   This function overrides the dd_form_btn's native behavior in order to submit an ajax request
@@ -274,9 +217,7 @@ $("#dd_form_btn").click(function(event) {
 
 $("#encrypted_acct_question").click(function(event) {
   event.preventDefault();
-  alert("For your safety your account number is stored encrypted as well as presented to you \nin an encrypted form.\n\n" +
-       "For your convenience, you can decrypt your bank account number at any time using our\n" +
-       "conveniently located decryption function."
+  alert("For your safety your account number is stored encrypted as well as presented to you \nin an encrypted form."
     )
 });
 
