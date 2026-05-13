@@ -26,10 +26,26 @@ class UsersController < ApplicationController
   def update
     message = false
 
-    user = User.where("id = '#{params[:user][:id]}'")[0]
+    # Authorization: Only allow users to update their own profile, or admins to update any profile
+    target_user_id = params[:user][:id]
+    
+    if target_user_id.to_s != current_user.id.to_s && !is_admin?
+      flash[:error] = "You are not authorized to update this user!"
+      redirect_to user_account_settings_path(user_id: current_user.id)
+      return
+    end
+
+    # Fix SQL injection by using proper parameter binding
+    user = User.find_by(id: target_user_id)
 
     if user
-      user.update(user_params_without_password)
+      # Use different parameter methods based on admin status
+      if is_admin?
+        user.update(admin_user_params_without_password)
+      else
+        user.update(user_params_without_password)
+      end
+      
       if params[:user][:password].present? && (params[:user][:password] == params[:user][:password_confirmation])
         user.password = params[:user][:password]
       end
@@ -52,6 +68,11 @@ class UsersController < ApplicationController
 
   # unpermitted attributes are ignored in production
   def user_params_without_password
+    params.require(:user).permit(:email, :first_name, :last_name)
+  end
+
+  # Admin-only parameter method that allows updating admin status
+  def admin_user_params_without_password
     params.require(:user).permit(:email, :admin, :first_name, :last_name)
   end
 end
