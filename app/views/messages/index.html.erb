@@ -114,6 +114,7 @@ $("#submit_button").click(function(event) {
       url: <%= "/users/#{current_user.id}/messages.json".inspect.html_safe %>,
     data: valuesToSubmit,
     type: "POST",
+    beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
     success: function(response) {
     if (response.msg == "failure") {
       $('#failure').show(500).delay(1500).fadeOut();

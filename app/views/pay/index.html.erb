@@ -240,6 +240,7 @@ $("#decrypt_btn").click(function(event){
       url: <%= sanitize(decrypted_bank_acct_num_user_pay_index_path(:format => "json", user_id: current_user.id).inspect) %>,
     data: valuesToSubmit,
     type: "POST",
+    beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
     success: function(response) {
     $('#success').show(500).delay(1500).fadeOut();
     decryptShow(response);
@@ -262,6 +263,7 @@ $("#dd_form_btn").click(function(event) {
       url: <%= sanitize(update_dd_info_user_pay_index_path(:format => "json").inspect) %>,
     data: valuesToSubmit,
     type: "POST",
+    beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
     success: function(response) {
     $('#success').show(500).delay(1500).fadeOut();
     populateTable();
