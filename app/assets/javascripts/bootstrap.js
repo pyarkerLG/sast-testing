@@ -90,7 +90,8 @@
     this.options = options
     this.$element = $(element)
       .delegate('[data-dismiss="modal"]', 'click.dismiss.modal', $.proxy(this.hide, this))
-    this.options.remote && this.$element.find('.modal-body').load(this.options.remote)
+    // Security fix: Disable remote content loading to prevent CSRF and content injection attacks
+    // this.options.remote && this.$element.find('.modal-body').load(this.options.remote)
   }
 
   Modal.prototype = {
@@ -291,7 +292,8 @@
     var $this = $(this)
       , href = $this.attr('href')
       , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
-      , option = $target.data('modal') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $target.data(), $this.data())
+      // Security fix: Remove remote option to prevent CSRF and content injection attacks
+      , option = $target.data('modal') ? 'toggle' : $.extend({}, $target.data(), $this.data())
 
     e.preventDefault()
 
@@ -932,7 +934,8 @@
       var $tip = this.tip()
         , title = this.getTitle()
 
-      $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+      // Security fix: Always use text() to prevent XSS attacks
+      $tip.find('.tooltip-inner').text(title)
       $tip.removeClass('fade in top bottom left right')
     }
 
@@ -1108,8 +1111,9 @@
         , title = this.getTitle()
         , content = this.getContent()
 
-      $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
-      $tip.find('.popover-content')[this.options.html ? 'html' : 'text'](content)
+      // Security fix: Always use text() to prevent XSS attacks
+      $tip.find('.popover-title').text(title)
+      $tip.find('.popover-content').text(content)
 
       $tip.removeClass('fade top bottom left right in')
     }
@@ -1981,8 +1985,10 @@
 
   , highlighter: function (item) {
       var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-      return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-        return '<strong>' + match + '</strong>'
+      // Escape HTML to prevent XSS
+      var escapedItem = $('<div>').text(item).html()
+      return escapedItem.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+        return '<strong>' + $('<div>').text(match).html() + '</strong>'
       })
     }
 
